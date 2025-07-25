@@ -48,7 +48,7 @@ const Chat = () => {
       // Listen for new messages
       socket.on("new_message", (message) => {
         setMessages((prev) => [...prev, message]);
-        scrollToBottom();
+        // scrollToBottom();
       });
 
       // Listen for typing status
@@ -84,13 +84,15 @@ const Chat = () => {
   }, [activeConversation, socket, user]);
 
   useEffect(() => {
-    scrollToBottom();
+    // scrollToBottom();
   }, [messages]);
 
   const fetchConversations = async () => {
     try {
       const response = await api.get("/chat/conversations/");
       setConversations(response.data.results || response.data);
+      console.log("Conversations fetched:", response.data.results || response.data);
+      
 
       // Auto-select conversation if specified in URL
       const orderId = searchParams.get("order");
@@ -119,13 +121,13 @@ const Chat = () => {
             fetchMessages(newConversation.id);
           } catch (createError) {
             console.error("Error creating conversation:", createError);
-            showError("فشل في إنشاء المحادثة لهذا الطلب");
+            // showError("فشل في إنشاء المحادثة لهذا الطلب");
           }
         }
       }
     } catch (error) {
       console.error("Error fetching conversations:", error);
-      showError("فشل في تحميل المحادثات");
+      // showError("فشل في تحميل المحادثات");
     } finally {
       setLoading(false);
     }
@@ -142,7 +144,7 @@ const Chat = () => {
       await api.post(`/chat/conversations/${conversationId}/mark-read/`);
     } catch (error) {
       console.error("Error fetching messages:", error);
-      showError("فشل في تحميل الرسائل");
+      // showError("فشل في تحميل الرسائل");
     }
   };
 
@@ -166,15 +168,15 @@ const Chat = () => {
       setNewMessage("");
 
       // Emit message via socket
-      if (socket) {
-        socket.emit("send_message", {
-          conversation_id: activeConversation.id,
-          content: newMessage.trim(),
-        });
-      }
+      // if (socket) {
+      //   socket.emit("send_message", {
+      //     conversation_id: activeConversation.id,
+      //     content: newMessage.trim(),
+      //   });
+      // }
     } catch (error) {
       console.error("Error sending message:", error);
-      showError("فشل في إرسال الرسالة");
+      // showError("فشل في إرسال الرسالة");
     } finally {
       setSending(false);
     }
@@ -202,9 +204,9 @@ const Chat = () => {
     }
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  // const scrollToBottom = () => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // };
 
   const formatTime = (dateString) => {
     return new Date(dateString).toLocaleTimeString("ar-EG", {
@@ -344,11 +346,11 @@ const Chat = () => {
                                   : "مباشر"}
                               </span>
 
-                              {conversation.unread_count > 0 && (
+                              {/* {conversation.unread_count > 0 && (
                                 <span className="badge bg-danger rounded-pill">
                                   {conversation.unread_count}
                                 </span>
-                              )}
+                              )} */}
                             </div>
                           </div>
                         </div>
@@ -440,6 +442,8 @@ const Chat = () => {
                 >
                   <div className="p-3">
                     {messages.map((message, index) => {
+                      if (!message.sender) return null;
+
                       const isOwn = message.sender.id === user.id;
                       const showDate =
                         index === 0 ||

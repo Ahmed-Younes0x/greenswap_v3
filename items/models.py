@@ -48,10 +48,11 @@ class Item(models.Model):
         ('expired', 'منتهي الصلاحية'),
     ]
 
+    image = models.ImageField(upload_to='items/', null=True, blank=True)  # الصورة الوحيدة
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='items')
     title = models.CharField(_('العنوان'), max_length=200)
     description = models.TextField(_('الوصف'))
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='items', verbose_name=_('الفئة'))
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='items', verbose_name=_('المالك'))
     
     # Pricing and Quantity
     price = models.DecimalField(_('السعر'), max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
@@ -122,7 +123,9 @@ class Item(models.Model):
             self.save()
 
 class ItemImage(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='images', verbose_name=_('المنتج'))
+    # item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='images', verbose_name=_('المنتج'))
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='images')
+
     image = models.ImageField(_('الصورة'), upload_to='items/')
     alt_text = models.CharField(_('النص البديل'), max_length=200, blank=True)
     is_primary = models.BooleanField(_('الصورة الرئيسية'), default=False)

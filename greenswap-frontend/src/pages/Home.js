@@ -69,10 +69,10 @@ const Home = () => {
                     <i className="bi bi-rocket-takeoff me-2"></i>
                     ابدأ الآن
                   </Link>
-                  <Link to="/ai-classify" className="btn btn-outline-light btn-lg px-4 py-3">
+                  {/* <Link to="/ai-classify" className="btn btn-outline-light btn-lg px-4 py-3">
                     <i className="bi bi-robot me-2"></i>
                     تصنيف ذكي
-                  </Link>
+                  </Link> */}
                   <Link to="/ai-chat" className="btn btn-outline-light btn-lg px-4 py-3">
                     <i className="bi bi-chat-dots me-2"></i>
                     البوت الذكي

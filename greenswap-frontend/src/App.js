@@ -17,6 +17,7 @@ import Profile from './pages/Auth/Profile';
 import Items from './pages/Items/Items';
 import ItemDetail from './pages/Items/ItemDetail';
 import AddItem from './pages/Items/AddItem';
+import Verfy from './pages/Verfy';
 import EditItem from './pages/Items/EditItem';
 import Orders from './pages/Orders/Orders';
 import OrderDetail from './pages/Orders/OrderDetail';
@@ -29,9 +30,11 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Notifications from './pages/Notifications/Notifications';
 import About from './pages/About/About';
 import Contact from './pages/Contact/Contact';
+import PaymentPage from './pages/PaymentPage';
 import Help from './pages/Help/Help';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import NotificationToast from './components/Notifications/NotificationToast';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 function App() {
   return (
@@ -47,6 +50,8 @@ function App() {
                   
                   {/* Auth Routes */}
                   <Route path="/auth" element={<AuthSelection />} />
+                  <Route path="/auth/verfy" element={<Verfy />} />
+                  <Route path="/auth/reset" element={<ResetPasswordPage />} />
                   <Route path="/login/individual" element={<IndividualLogin />} />
                   <Route path="/login/business" element={<BusinessLogin />} />
                   <Route path="/login/recycling" element={<RecyclingLogin />} />
@@ -66,6 +71,7 @@ function App() {
                   <Route path="/ai-analytics" element={<AIAnalytics />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/payment/:orderId" element={<PaymentPage />} />
                   <Route path="/help" element={<Help />} />
                   
                   {/* Protected Routes */}

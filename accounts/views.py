@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions, status
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -6,6 +7,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+
+from accounts.email_verf import send_verification_email , send_reset_email
 from .models import User, UserProfile, UserRating
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserSerializer, 
@@ -25,6 +28,8 @@ class UserRegistrationView(generics.CreateAPIView):
         print("QUERY PARAMS:", request.query_params)
         print("USER:", request.user)
         print("===============================")
+        token=send_verification_email(request.data.get('email'))
+        request.data['token'] = token
         serializer = self.get_serializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
@@ -44,8 +49,89 @@ class UserRegistrationView(generics.CreateAPIView):
                 status=status.HTTP_409_CONFLICT)
 
             
+            
 
 
+class ResetPassword(APIView):
+    permission_classes = [permissions.AllowAny]
+    def post(self, request):
+        print(request.data)
+        email = request.data.get('email')
+        if not email:
+            return Response({'detail': 'البريد الإلكتروني مطلوب'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+            token = send_reset_email(email)
+            user.token = token
+            user.is_forgot_password = True
+            user.save()
+            return Response({'detail': 'تم إرسال رمز التحقق إلى بريدك الإلكتروني'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'detail': 'هذا البريد الإلكتروني غير مسجل'}, status=status.HTTP_404_NOT_FOUND)
+
+    def patch(self, request):
+        print(request.data)
+
+        email = request.data.get('email')
+        token = request.data.get('token')
+        password = request.data.get('password')
+        confirm_password = request.data.get('confirm_password')
+
+        if not email or not token or not password or not confirm_password:
+            return Response({'detail': 'جميع الحقول مطلوبة'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if password != confirm_password:
+            return Response({'detail': 'كلمتا المرور غير متطابقتين'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+            if user.token != token or not user.is_forgot_password:
+                return Response({'detail': 'رمز غير صالح أو انتهت صلاحيته'}, status=status.HTTP_400_BAD_REQUEST)
+
+            user.set_password(password)
+            user.is_forgot_password = False
+            user.token = None  # Clear token after use
+            user.save()
+            return Response({'detail': 'تم إعادة تعيين كلمة المرور بنجاح'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'detail': 'المستخدم غير موجود'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def reset_password(request):
+    email = request.data.get('email')
+    if not email:
+        return Response({'error': 'البريد الإلكتروني مطلوب'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.get(email=email)
+        token = send_reset_email(email)
+        user.token = token
+        user.is_forgot_password = True
+        user.save()
+        return Response({'message': 'تم إرسال رمز التحقق إلى بريدك الإلكتروني'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'هذا البريد الإلكتروني غير مسجل'}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def verf(request):
+    print(request.POST) #out <rest_framework.request.Request: POST '/api/auth/verf/'>
+    token = request.data.get('token')  # Get token from JSON body
+    if not token:
+        return Response({'error': 'رمز التحقق غير موجود'}, status=status.HTTP_408_REQUEST_TIMEOUT)
+
+    try:
+        user = User.objects.get(token=token)
+        user.is_verified = True
+        user.token = None  # Clear the token after verification
+        user.save()
+        return Response({'message': 'تم التحقق من الحساب بنجاح'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'رمز التحقق غير صالح أو منتهي الصلاحية'}, status=status.HTTP_409_CONFLICT)
+    
 class UserLoginView(generics.GenericAPIView):
     serializer_class = UserLoginSerializer
     permission_classes = [permissions.AllowAny]

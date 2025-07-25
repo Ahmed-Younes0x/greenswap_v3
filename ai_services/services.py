@@ -9,7 +9,7 @@ import openai
 from PIL import Image
 import io
 import requests
-from .reports import .
+# from .reports import .
 # تكوين OpenAI
 if hasattr(settings, 'OPENAI_API_KEY') and settings.OPENAI_API_KEY:
     openai.api_key = settings.OPENAI_API_KEY
@@ -773,15 +773,21 @@ class AIService:
             info_path = os.path.join(base_dir, "info.txt")
             with open(info_path, "r", encoding="utf-8") as f:
                 file_context = f.read()
-            if message.includes("تقرير") and message.includes("إعادة التدوير"):
-                file_context = file_context.replace("تقرير", "تقرير إعادة التدوير")
+            # if message.includes("تقرير") and message.includes("إعادة التدوير"):
+            #     file_context = file_context.replace("تقرير", "تقرير إعادة التدوير")
             messa={
                 "role": "system",
                 "content": f"المعلومات التالية قد تساعدك في الإجابة على الأسئلة:\n{file_context}"
             }
         except Exception as e:
             print("Failed to load info.txt:", e)
-        client = openai.OpenAI(api_key="place holder")"
+        # api_key = "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"
+            # system_prompt = (
+            #     "You are a helpful assistant. Use the following document as context to answer the user's question.\n\n"
+            #     f"Document:\n{file_content[:2000]}\n\n"
+            #     "Answer the user's question based on the document above."
+            # )
+        client = openai.OpenAI(api_key="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")  # No "Bearer" here
         response = client.chat.completions.create(
             model="gpt-4o-mini",
                                 messages=[

@@ -170,12 +170,14 @@ const AddItem = () => {
       });
       // Add images
       images.forEach((image, index) => {
-        submitData.append("images", image);
+        submitData.append("image", image);
       });
       console.log("Form data before submission:", formData);
 
       console.log("FormData as array:", Array.from(submitData.entries()));
       const response = await api.post("/items/create/", submitData);
+      console.log("Response from item creation:", response.data);
+      
 
       showSuccess("تم إضافة المنتج بنجاح");
       navigate(`/items/${response.data.id}`);

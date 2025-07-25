@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { useNotification } from '../../contexts/NotificationContext';
-import {api} from '../../services/api';
-
+import React, { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { useNotification } from "../../contexts/NotificationContext";
+import { api } from "../../services/api";
 
 const Items = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -10,20 +9,20 @@ const Items = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    search: searchParams.get('search') || '',
-    category: searchParams.get('category') || '',
-    condition: searchParams.get('condition') || '',
-    min_price: searchParams.get('min_price') || '',
-    max_price: searchParams.get('max_price') || '',
-    location: searchParams.get('location') || '',
-    ordering: searchParams.get('ordering') || '-created_at'
+    search: searchParams.get("search") || "",
+    category: searchParams.get("category") || "",
+    condition: searchParams.get("condition") || "",
+    min_price: searchParams.get("min_price") || "",
+    max_price: searchParams.get("max_price") || "",
+    location: searchParams.get("location") || "",
+    ordering: searchParams.get("ordering") || "-created_at",
   });
   const [pagination, setPagination] = useState({
-    page: parseInt(searchParams.get('page')) || 1,
+    page: parseInt(searchParams.get("page")) || 1,
     totalPages: 1,
     hasNext: false,
     hasPrevious: false,
-    count: 0
+    count: 0,
   });
   const { showError } = useNotification();
 
@@ -38,10 +37,10 @@ const Items = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get('/items/categories/');
+      const response = await api.get("/items/categories/");
       setCategories(response.data.results || response.data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -49,31 +48,31 @@ const Items = () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value) params.append(key, value);
       });
-      
-      params.append('page', pagination.page);
+
+      params.append("page", pagination.page);
 
       const response = await api.get(`/items/?${params}`);
-      
-      setItems(response.data.results || response.data);
-      console.log('Fetched items:', items);
-      
-      
+
+      const fetchedItems = response.data.results || response.data;
+      console.log("Fetched items:", fetchedItems);
+      setItems(fetchedItems);
+
       if (response.data.pagination) {
-        setPagination(prev => ({
+        setPagination((prev) => ({
           ...prev,
           totalPages: response.data.pagination.num_pages,
           hasNext: response.data.pagination.has_next,
           hasPrevious: response.data.pagination.has_previous,
-          count: response.data.pagination.count
+          count: response.data.pagination.count,
         }));
       }
     } catch (error) {
-      console.error('Error fetching items:', error);
-      showError('فشل في تحميل المنتجات');
+      console.error("Error fetching items:", error);
+      showError("فشل في تحميل المنتجات");
     } finally {
       setLoading(false);
     }
@@ -84,57 +83,57 @@ const Items = () => {
     Object.entries(filters).forEach(([key, value]) => {
       if (value) params.set(key, value);
     });
-    if (pagination.page > 1) params.set('page', pagination.page);
+    if (pagination.page > 1) params.set("page", pagination.page);
     setSearchParams(params);
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   const handlePageChange = (newPage) => {
-    setPagination(prev => ({ ...prev, page: newPage }));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setPagination((prev) => ({ ...prev, page: newPage }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const clearFilters = () => {
     setFilters({
-      search: '',
-      category: '',
-      condition: '',
-      min_price: '',
-      max_price: '',
-      location: '',
-      ordering: '-created_at'
+      search: "",
+      category: "",
+      condition: "",
+      min_price: "",
+      max_price: "",
+      location: "",
+      ordering: "-created_at",
     });
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   const conditionOptions = [
-    { value: 'new', label: 'جديد' },
-    { value: 'like_new', label: 'شبه جديد' },
-    { value: 'good', label: 'جيد' },
-    { value: 'fair', label: 'مقبول' },
-    { value: 'poor', label: 'سيء' }
+    { value: "new", label: "جديد" },
+    { value: "like_new", label: "شبه جديد" },
+    { value: "good", label: "جيد" },
+    { value: "fair", label: "مقبول" },
+    { value: "poor", label: "سيء" },
   ];
 
   const sortOptions = [
-    { value: '-created_at', label: 'الأحدث' },
-    { value: 'created_at', label: 'الأقدم' },
-    { value: 'price', label: 'السعر: من الأقل للأعلى' },
-    { value: '-price', label: 'السعر: من الأعلى للأقل' },
-    { value: '-views_count', label: 'الأكثر مشاهدة' },
-    { value: '-likes_count', label: 'الأكثر إعجاباً' }
+    { value: "-created_at", label: "الأحدث" },
+    { value: "created_at", label: "الأقدم" },
+    { value: "price", label: "السعر: من الأقل للأعلى" },
+    { value: "-price", label: "السعر: من الأعلى للأقل" },
+    { value: "-views_count", label: "الأكثر مشاهدة" },
+    { value: "-likes_count", label: "الأكثر إعجاباً" },
   ];
 
   const getConditionBadge = (condition) => {
     const conditionConfig = {
-      new: { class: 'bg-success', text: 'جديد' },
-      like_new: { class: 'bg-info', text: 'شبه جديد' },
-      good: { class: 'bg-primary', text: 'جيد' },
-      fair: { class: 'bg-warning', text: 'مقبول' },
-      poor: { class: 'bg-secondary', text: 'سيء' }
+      new: { class: "bg-success", text: "جديد" },
+      like_new: { class: "bg-info", text: "شبه جديد" },
+      good: { class: "bg-primary", text: "جيد" },
+      fair: { class: "bg-warning", text: "مقبول" },
+      poor: { class: "bg-secondary", text: "سيء" },
     };
     const config = conditionConfig[condition] || conditionConfig.good;
     return <span className={`badge ${config.class}`}>{config.text}</span>;
@@ -145,7 +144,10 @@ const Items = () => {
       <div className="row">
         {/* Sidebar Filters */}
         <div className="col-lg-3 mb-4">
-          <div className="card glass-card border-0 sticky-top" style={{ top: '100px' }}>
+          <div
+            className="card glass-card border-0 sticky-top"
+            style={{ top: "100px" }}
+          >
             <div className="card-header bg-primary text-white">
               <h5 className="mb-0">
                 <i className="bi bi-funnel me-2"></i>
@@ -162,7 +164,9 @@ const Items = () => {
                     className="form-control"
                     placeholder="ابحث عن منتج..."
                     value={filters.search}
-                    onChange={(e) => handleFilterChange('search', e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("search", e.target.value)
+                    }
                   />
                   <button className="btn btn-outline-secondary" type="button">
                     <i className="bi bi-search"></i>
@@ -176,10 +180,12 @@ const Items = () => {
                 <select
                   className="form-select"
                   value={filters.category}
-                  onChange={(e) => handleFilterChange('category', e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange("category", e.target.value)
+                  }
                 >
                   <option value="">جميع الفئات</option>
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name} ({category.items_count})
                     </option>
@@ -193,10 +199,12 @@ const Items = () => {
                 <select
                   className="form-select"
                   value={filters.condition}
-                  onChange={(e) => handleFilterChange('condition', e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange("condition", e.target.value)
+                  }
                 >
                   <option value="">جميع الحالات</option>
-                  {conditionOptions.map(option => (
+                  {conditionOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -214,7 +222,9 @@ const Items = () => {
                       className="form-control"
                       placeholder="من"
                       value={filters.min_price}
-                      onChange={(e) => handleFilterChange('min_price', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange("min_price", e.target.value)
+                      }
                     />
                   </div>
                   <div className="col-6">
@@ -223,7 +233,9 @@ const Items = () => {
                       className="form-control"
                       placeholder="إلى"
                       value={filters.max_price}
-                      onChange={(e) => handleFilterChange('max_price', e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange("max_price", e.target.value)
+                      }
                     />
                   </div>
                 </div>
@@ -237,7 +249,9 @@ const Items = () => {
                   className="form-control"
                   placeholder="المدينة أو المنطقة"
                   value={filters.location}
-                  onChange={(e) => handleFilterChange('location', e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange("location", e.target.value)
+                  }
                 />
               </div>
 
@@ -260,24 +274,25 @@ const Items = () => {
             <div>
               <h2 className="fw-bold mb-2">المنتجات المتاحة</h2>
               <p className="text-muted mb-0">
-                {pagination.count > 0 && `عرض ${items.length} من أصل ${pagination.count} منتج`}
+                {pagination.count > 0 &&
+                  `عرض ${items.length} من أصل ${pagination.count} منتج`}
               </p>
             </div>
-            
+
             <div className="d-flex gap-2 align-items-center">
               <select
                 className="form-select"
-                style={{ width: '200px' }}
+                style={{ width: "200px" }}
                 value={filters.ordering}
-                onChange={(e) => handleFilterChange('ordering', e.target.value)}
+                onChange={(e) => handleFilterChange("ordering", e.target.value)}
               >
-                {sortOptions.map(option => (
+                {sortOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </select>
-              
+
               <Link to="/add-item" className="btn btn-primary">
                 <i className="bi bi-plus-lg me-2"></i>
                 إضافة منتج
@@ -286,49 +301,61 @@ const Items = () => {
           </div>
 
           {/* Active Filters */}
-          {(filters.search || filters.category || filters.condition || filters.min_price || filters.max_price || filters.location) && (
+          {(filters.search ||
+            filters.category ||
+            filters.condition ||
+            filters.min_price ||
+            filters.max_price ||
+            filters.location) && (
             <div className="mb-4">
               <div className="d-flex flex-wrap gap-2 align-items-center">
                 <span className="text-muted small">الفلاتر النشطة:</span>
                 {filters.search && (
                   <span className="badge bg-primary">
                     البحث: {filters.search}
-                    <button 
-                      className="btn-close btn-close-white ms-2" 
-                      style={{ fontSize: '0.6rem' }}
-                      onClick={() => handleFilterChange('search', '')}
+                    <button
+                      className="btn-close btn-close-white ms-2"
+                      style={{ fontSize: "0.6rem" }}
+                      onClick={() => handleFilterChange("search", "")}
                     ></button>
                   </span>
                 )}
                 {filters.category && (
                   <span className="badge bg-info">
-                    الفئة: {categories.find(c => c.id == filters.category)?.name}
-                    <button 
-                      className="btn-close btn-close-white ms-2" 
-                      style={{ fontSize: '0.6rem' }}
-                      onClick={() => handleFilterChange('category', '')}
+                    الفئة:{" "}
+                    {categories.find((c) => c.id == filters.category)?.name}
+                    <button
+                      className="btn-close btn-close-white ms-2"
+                      style={{ fontSize: "0.6rem" }}
+                      onClick={() => handleFilterChange("category", "")}
                     ></button>
                   </span>
                 )}
                 {filters.condition && (
                   <span className="badge bg-success">
-                    الحالة: {conditionOptions.find(c => c.value === filters.condition)?.label}
-                    <button 
-                      className="btn-close btn-close-white ms-2" 
-                      style={{ fontSize: '0.6rem' }}
-                      onClick={() => handleFilterChange('condition', '')}
+                    الحالة:{" "}
+                    {
+                      conditionOptions.find(
+                        (c) => c.value === filters.condition
+                      )?.label
+                    }
+                    <button
+                      className="btn-close btn-close-white ms-2"
+                      style={{ fontSize: "0.6rem" }}
+                      onClick={() => handleFilterChange("condition", "")}
                     ></button>
                   </span>
                 )}
                 {(filters.min_price || filters.max_price) && (
                   <span className="badge bg-warning">
-                    السعر: {filters.min_price || '0'} - {filters.max_price || '∞'}
-                    <button 
-                      className="btn-close btn-close-white ms-2" 
-                      style={{ fontSize: '0.6rem' }}
+                    السعر: {filters.min_price || "0"} -{" "}
+                    {filters.max_price || "∞"}
+                    <button
+                      className="btn-close btn-close-white ms-2"
+                      style={{ fontSize: "0.6rem" }}
                       onClick={() => {
-                        handleFilterChange('min_price', '');
-                        handleFilterChange('max_price', '');
+                        handleFilterChange("min_price", "");
+                        handleFilterChange("max_price", "");
                       }}
                     ></button>
                   </span>
@@ -336,10 +363,10 @@ const Items = () => {
                 {filters.location && (
                   <span className="badge bg-secondary">
                     الموقع: {filters.location}
-                    <button 
-                      className="btn-close btn-close-white ms-2" 
-                      style={{ fontSize: '0.6rem' }}
-                      onClick={() => handleFilterChange('location', '')}
+                    <button
+                      className="btn-close btn-close-white ms-2"
+                      style={{ fontSize: "0.6rem" }}
+                      onClick={() => handleFilterChange("location", "")}
                     ></button>
                   </span>
                 )}
@@ -350,7 +377,11 @@ const Items = () => {
           {/* Loading */}
           {loading ? (
             <div className="text-center py-5 glass-card">
-              <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+              <div
+                className="spinner-border text-primary"
+                role="status"
+                style={{ width: "3rem", height: "3rem" }}
+              >
                 <span className="visually-hidden">جاري التحميل...</span>
               </div>
               <p className="mt-3 text-muted">جاري تحميل المنتجات...</p>
@@ -360,12 +391,15 @@ const Items = () => {
               {/* Items Grid */}
               {items.length > 0 ? (
                 <div className="row g-4">
-                  {items.map(item => (
+                  {items.map((item) => (
                     <div key={item.id} className="col-lg-4 col-md-6">
                       <div className="product-card glass-card hover-lift-lg">
                         <div className="position-relative">
                           <img
-                            src={item.primary_image || 'http://localhost:8000/media/items/placeholder.png'}
+                            src={
+                              item.image ||
+                              "http://localhost:8000/media/items/placeholder.png"
+                            }
                             alt={item.title}
                             className="product-image"
                             loading="lazy"
@@ -388,22 +422,31 @@ const Items = () => {
                             {getConditionBadge(item.condition)}
                           </div>
                         </div>
-                        
+
                         <div className="card-body">
-                          <h6 className="card-title fw-bold mb-2" style={{ height: '48px', overflow: 'hidden' }}>
+                          <h6
+                            className="card-title fw-bold mb-2"
+                            style={{ height: "48px", overflow: "hidden" }}
+                          >
                             {item.title}
                           </h6>
-                          <p className="card-text text-muted small mb-3" style={{ height: '60px', overflow: 'hidden' }}>
+                          <p
+                            className="card-text text-muted small mb-3"
+                            style={{ height: "60px", overflow: "hidden" }}
+                          >
                             {item.description.substring(0, 100)}...
                           </p>
-                          
+
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <div>
                               <span className="fw-bold text-primary fs-5">
-                                {parseFloat(item.price).toLocaleString('ar-EG')} جنيه
+                                {parseFloat(item.price).toLocaleString("ar-EG")}{" "}
+                                جنيه
                               </span>
                               {item.is_negotiable && (
-                                <small className="text-muted d-block">قابل للتفاوض</small>
+                                <small className="text-muted d-block">
+                                  قابل للتفاوض
+                                </small>
                               )}
                             </div>
                             <div className="text-end">
@@ -418,21 +461,24 @@ const Items = () => {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="mb-3">
                             <span className="badge bg-secondary me-2">
                               {item.category_name}
                             </span>
                           </div>
-                          
+
                           <div className="d-flex align-items-center text-muted small mb-2">
                             <i className="bi bi-geo-alt me-1"></i>
                             {item.location}
                           </div>
-                          
+
                           <div className="d-flex align-items-center text-muted small mb-3">
                             <img
-                              src={item.owner.avatar_url || 'http://localhost:8000/media/avatar/placeholder.png'}
+                              src={
+                                item.owner.avatar_url ||
+                                "http://localhost:8000/media/avatar/placeholder.png"
+                              }
                               alt={item.owner.full_name}
                               className="rounded-circle me-2"
                               width="20"
@@ -440,11 +486,14 @@ const Items = () => {
                             />
                             {item.owner.full_name}
                             {item.owner.is_verified && (
-                              <i className="bi bi-patch-check-fill text-primary ms-1" title="حساب موثق"></i>
+                              <i
+                                className="bi bi-patch-check-fill text-primary ms-1"
+                                title="حساب موثق"
+                              ></i>
                             )}
                           </div>
                         </div>
-                        
+
                         <div className="card-footer bg-transparent border-0 pt-0">
                           <Link
                             to={`/items/${item.id}`}
@@ -460,10 +509,18 @@ const Items = () => {
                 </div>
               ) : (
                 <div className="text-center py-5">
-                  <i className="bi bi-search text-muted" style={{ fontSize: '4rem' }}></i>
+                  <i
+                    className="bi bi-search text-muted"
+                    style={{ fontSize: "4rem" }}
+                  ></i>
                   <h4 className="mt-3 text-muted">لا توجد منتجات</h4>
-                  <p className="text-muted">جرب تغيير معايير البحث أو الفلترة</p>
-                  <button className="btn btn-outline-primary" onClick={clearFilters}>
+                  <p className="text-muted">
+                    جرب تغيير معايير البحث أو الفلترة
+                  </p>
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={clearFilters}
+                  >
                     <i className="bi bi-arrow-clockwise me-2"></i>
                     مسح الفلاتر
                   </button>
@@ -474,7 +531,11 @@ const Items = () => {
               {pagination.totalPages > 1 && (
                 <nav className="mt-5">
                   <ul className="pagination justify-content-center">
-                    <li className={`page-item ${!pagination.hasPrevious ? 'disabled' : ''}`}>
+                    <li
+                      className={`page-item ${
+                        !pagination.hasPrevious ? "disabled" : ""
+                      }`}
+                    >
                       <button
                         className="page-link"
                         onClick={() => handlePageChange(pagination.page - 1)}
@@ -484,19 +545,25 @@ const Items = () => {
                         السابق
                       </button>
                     </li>
-                    
+
                     {[...Array(pagination.totalPages)].map((_, index) => {
                       const pageNum = index + 1;
                       const isCurrentPage = pageNum === pagination.page;
-                      
+
                       // Show only 5 pages around current page
                       if (
                         pageNum === 1 ||
                         pageNum === pagination.totalPages ||
-                        (pageNum >= pagination.page - 2 && pageNum <= pagination.page + 2)
+                        (pageNum >= pagination.page - 2 &&
+                          pageNum <= pagination.page + 2)
                       ) {
                         return (
-                          <li key={pageNum} className={`page-item ${isCurrentPage ? 'active' : ''}`}>
+                          <li
+                            key={pageNum}
+                            className={`page-item ${
+                              isCurrentPage ? "active" : ""
+                            }`}
+                          >
                             <button
                               className="page-link"
                               onClick={() => handlePageChange(pageNum)}
@@ -517,8 +584,12 @@ const Items = () => {
                       }
                       return null;
                     })}
-                    
-                    <li className={`page-item ${!pagination.hasNext ? 'disabled' : ''}`}>
+
+                    <li
+                      className={`page-item ${
+                        !pagination.hasNext ? "disabled" : ""
+                      }`}
+                    >
                       <button
                         className="page-link"
                         onClick={() => handlePageChange(pagination.page + 1)}
@@ -529,11 +600,11 @@ const Items = () => {
                       </button>
                     </li>
                   </ul>
-                  
+
                   <div className="text-center mt-3">
                     <small className="text-muted">
-                      صفحة {pagination.page} من {pagination.totalPages} 
-                      ({pagination.count} منتج إجمالي)
+                      صفحة {pagination.page} من {pagination.totalPages}(
+                      {pagination.count} منتج إجمالي)
                     </small>
                   </div>
                 </nav>

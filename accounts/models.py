@@ -63,6 +63,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(_('رقم الهاتف'), max_length=15, blank=True)
     full_name = models.CharField(_('الاسم الكامل'), max_length=100)
     user_type = models.CharField(_('نوع المستخدم'), max_length=20, choices=USER_TYPES, default='individual')
+    token = models.CharField(_('رمز التحقق'), max_length=100, blank=True, null=True)
+    is_forgot_password = models.BooleanField(_('نسيت كلمة المرور'), default=False)
     
     # Profile Information
     avatar = models.ImageField(_('الصورة الشخصية'), upload_to='avatars/', blank=True, null=True)

@@ -42,12 +42,15 @@ urlpatterns = [
     path('api/ai/', include('ai_services.urls')),
     path('api/dashboard/', include('dashboard.urls')),
     path('api/reports/', include('reports.urls')),
-]
+    path('api/payment/', include('payment.urls')),
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) +static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# if settings.DEBUG:
+#     # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+#     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
-    # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 # Custom error handlers
 handler404 = 'greenswap_backend.views.handler404'
 handler500 = 'greenswap_backend.views.handler500'

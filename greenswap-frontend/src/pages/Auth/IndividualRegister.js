@@ -53,7 +53,7 @@ const IndividualRegister = () => {
       
       if (result.success) {
         showSuccess('تم إنشاء حسابك بنجاح! مرحباً بك في GreenSwap');
-        navigate('/');
+        navigate('/auth/verfy');
       } else {
         showError(result.error || 'فشل في إنشاء الحساب');
       }

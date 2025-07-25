@@ -38,30 +38,6 @@ const Navbar = () => {
             <li className="nav-item">
               <Link className="nav-link" to="/items">المنتجات</Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/ai-classify">تصنيف ذكي</Link>
-            </li>
-            <li className="nav-item dropdown">
-              <a 
-                className="nav-link dropdown-toggle" 
-                href="#" 
-                role="button" 
-                data-bs-toggle="dropdown"
-              >
-                خدمات AI
-              </a>
-              <ul className="dropdown-menu">
-                <li><Link className="dropdown-item" to="/ai-classify">
-                  <i className="bi bi-camera me-2"></i>تصنيف الصور
-                </Link></li>
-                <li><Link className="dropdown-item" to="/ai-chat">
-                  <i className="bi bi-robot me-2"></i>البوت الذكي
-                </Link></li>
-                <li><Link className="dropdown-item" to="/ai-analytics">
-                  <i className="bi bi-graph-up me-2"></i>تحليلات AI
-                </Link></li>
-              </ul>
-            </li>
             {isAuthenticated && (
               <>
                 <li className="nav-item">
@@ -69,6 +45,11 @@ const Navbar = () => {
                 </li>
                 <li className="nav-item">
                   <Link className="nav-link" to="/chat">المحادثات</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/ai-chat">
+                    <i className="bi bi-robot me-2"></i>البوت الذكي
+                  </Link>
                 </li>
               </>
             )}
@@ -80,11 +61,11 @@ const Navbar = () => {
                 <li className="nav-item">
                   <Link className="nav-link position-relative" to="/notifications">
                     <i className="bi bi-bell"></i>
-                    {unreadCount > 0 && (
+                    {/* {unreadCount > 0 && (
                       <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
-                    )}
+                    )} */}
                   </Link>
                 </li>
                 

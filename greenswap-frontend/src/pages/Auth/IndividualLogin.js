@@ -123,7 +123,7 @@ const IndividualLogin = () => {
                             تذكرني
                           </label>
                         </div>
-                        <Link to="/forgot-password" className="text-primary text-decoration-none">
+                        <Link to="/auth/reset" className="text-primary text-decoration-none">
                           نسيت كلمة المرور؟
                         </Link>
                       </div>
