@@ -22,7 +22,7 @@ class ItemAdmin(admin.ModelAdmin):
     
     fieldsets = (
         (None, {
-            'fields': ('title', 'description', 'category', 'owner')
+            'fields': ('title', 'description', 'category', 'owner', 'thumbnail')
         }),
         ('Pricing & Quantity', {
             'fields': ('price', 'quantity', 'is_negotiable')
@@ -42,10 +42,6 @@ class ItemAdmin(admin.ModelAdmin):
         }),
         ('Statistics', {
             'fields': ('views_count', 'likes_count', 'rating_average', 'rating_count'),
-            'classes': ('collapse',)
-        }),
-        ('Dates', {
-            'fields': ('created_at', 'updated_at', 'expires_at'),
             'classes': ('collapse',)
         })
     )
