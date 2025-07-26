@@ -142,6 +142,9 @@ class UserLoginView(generics.GenericAPIView):
         
         user = serializer.validated_data['user']
         refresh = RefreshToken.for_user(user)
+
+        if (not user.is_verified) and user.business_name:
+            return Response({'detail': 'لا يمكنك تسجيل الدخول حتى يتم الموافقة على حسابك.'}, status=403)
         
         return Response({
             'user': UserSerializer(user, context={'request': request}).data,
