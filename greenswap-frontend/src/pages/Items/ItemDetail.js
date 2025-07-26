@@ -228,7 +228,7 @@ const ItemDetail = () => {
           <div className="card border-0 shadow-sm">
             <div className="position-relative">
               <img
-                src={item.images?.[currentImageIndex]?.image_url || item.primary_image || 'http://localhost:8000/media/items/placeholder.png'}
+                src={item.images?.[currentImageIndex]?.image_url || item.image || 'http://localhost:8000/media/items/placeholder.png'}
                 alt={item.title}
                 className="card-img-top cursor-pointer"
                 style={{ height: '450px', objectFit: 'cover' }}
