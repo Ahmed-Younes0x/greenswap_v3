@@ -63,33 +63,31 @@ class ItemRatingSerializer(serializers.ModelSerializer):
 class ItemListSerializer(serializers.ModelSerializer):
     owner = UserPublicSerializer(read_only=True)
     category_name = serializers.CharField(source='category.name_ar', read_only=True)
-    # images = ItemImageSerializer(many=True)
+    image = serializers.SerializerMethodField()  # <-- Use method field
     is_liked = serializers.SerializerMethodField()
     distance = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
-        fields = ['id', 'title', 'description', 'price', 'quantity', 'condition', 'location', 
-                 'status', 'is_featured', 'is_urgent', 'owner', 'category_name', 'image', 
-                 'views_count', 'likes_count', 'rating_average', 'rating_count', 'created_at', 
-                 'is_liked', 'distance']
+        fields = [
+            'id', 'title', 'description', 'price', 'quantity', 'condition', 'location',
+            'status', 'is_featured', 'is_urgent', 'owner', 'category_name', 'image',
+            'views_count', 'likes_count', 'rating_average', 'rating_count', 'created_at',
+            'is_liked', 'distance'
+        ]
 
-    # def get_primary_image(self, obj):
-    #     primary_image = obj.images.filter(is_primary=True).first()
-    #     if not primary_image:
-    #         primary_image = obj.images.first()
-    #     if primary_image:
-    #         return self.context['request'].build_absolute_uri(primary_image.image.url)
-    #     return None
-
-    def get_primary_image(self, obj):
+    def get_image(self, obj):
         request = self.context.get('request')
         primary_image = obj.images.filter(is_primary=True).first() or obj.images.first()
-        
         if primary_image and primary_image.image and hasattr(primary_image.image, 'url'):
             if request:
                 return request.build_absolute_uri(primary_image.image.url)
             return primary_image.image.url
+        # fallback to main image field if exists
+        if obj.image and hasattr(obj.image, 'url'):
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
         return None
 
     def get_is_liked(self, obj):
@@ -107,19 +105,36 @@ class ItemListSerializer(serializers.ModelSerializer):
 class ItemDetailSerializer(serializers.ModelSerializer):
     owner = UserPublicSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
-    # images = ItemImageSerializer(many=True, read_only=True)
+    images = ItemImageSerializer(many=True, read_only=True)
     ratings = ItemRatingSerializer(many=True, read_only=True)
+    image = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     can_edit = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
-        fields = ['id', 'title', 'description', 'category', 'owner', 'price', 'quantity', 
-                 'is_negotiable', 'condition', 'weight', 'dimensions', 'material', 'location', 
-                 'latitude', 'longitude', 'status', 'is_featured', 'is_urgent', 'ai_analyzed',
-                 'ai_category_suggestion', 'ai_condition_assessment', 'ai_price_suggestion',
-                 'created_at', 'updated_at', 'expires_at', 'views_count', 'likes_count',
-                 'rating_average', 'rating_count', 'image', 'ratings', 'is_liked', 'can_edit']
+        fields = [
+            'id', 'title', 'description', 'category', 'owner', 'price', 'quantity', 
+            'is_negotiable', 'condition', 'weight', 'dimensions', 'material', 'location', 
+            'latitude', 'longitude', 'status', 'is_featured', 'is_urgent', 'ai_analyzed',
+            'ai_category_suggestion', 'ai_condition_assessment', 'ai_price_suggestion',
+            'created_at', 'updated_at', 'expires_at', 'views_count', 'likes_count',
+            'rating_average', 'rating_count', 'image', 'images', 'ratings', 'is_liked', 'can_edit'
+        ]
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        primary_image = obj.images.filter(is_primary=True).first() or obj.images.first()
+        if primary_image and primary_image.image and hasattr(primary_image.image, 'url'):
+            if request:
+                return request.build_absolute_uri(primary_image.image.url)
+            return primary_image.image.url
+        # fallback to main image field if exists
+        if obj.image and hasattr(obj.image, 'url'):
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
 
     def get_is_liked(self, obj):
         request = self.context.get('request')

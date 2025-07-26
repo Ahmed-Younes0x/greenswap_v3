@@ -1,18 +1,16 @@
-import axios from 'axios';
+import axios from "axios";
 
-// إنشاء instance مخصص لـ axios
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  }
+const API_BASE_URL = "http://localhost:8000/api";
+
+// إنشاء instance من axios
+export const api = axios.create({
+  baseURL: API_BASE_URL
 });
 
-// إضافة token للطلبات تلقائياً
+// إضافة interceptor للتوكن
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem("access_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,18 +21,41 @@ api.interceptors.request.use(
   }
 );
 
-// معالجة الاستجابات والأخطاء
+// إضافة interceptor للاستجابة
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      // إزالة token منتهي الصلاحية
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
-      window.location.href = '/auth';
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshToken = localStorage.getItem("refresh_token");
+        if (refreshToken) {
+          const response = await axios.post(
+            `${API_BASE_URL}/auth/token/refresh/`,
+            {
+              refresh: refreshToken,
+            }
+          );
+
+          const { access } = response.data;
+          localStorage.setItem("access_token", access);
+
+          // إعادة المحاولة مع التوكن الجديد
+          originalRequest.headers.Authorization = `Bearer ${access}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        // فشل في تجديد التوكن - تسجيل خروج
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      }
     }
+
     return Promise.reject(error);
   }
 );

@@ -40,14 +40,15 @@ class ItemCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        # Debug print of raw request data
         print("==== Incoming Request Data ====")
         print("DATA:", request.data)
         print("FILES:", request.FILES)
         print("QUERY PARAMS:", request.query_params)
         print("USER:", request.user)
         print("===============================")
-        request.data['images'] = request.FILES.getlist('images')
+        # Use only one image
+        if 'image' in request.FILES:
+            request.data['image'] = request.FILES['image']
         try:
             return super().create(request, *args, **kwargs)
         except Exception as e:
