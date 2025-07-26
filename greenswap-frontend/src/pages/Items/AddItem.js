@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
@@ -9,6 +9,7 @@ const AddItem = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showSuccess, showError } = useNotification();
+  const fileInput = useRef(null);
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -75,6 +76,9 @@ const AddItem = () => {
       showError("يمكن رفع 5 صور كحد أقصى");
       return;
     }
+
+    console.log("handleImageChange called with files:", files);
+    fileInput.current = files[0]
 
     // Validate file types and sizes
     const validFiles = files.filter((file) => {
@@ -169,9 +173,11 @@ const AddItem = () => {
         }
       });
       // Add images
-      images.forEach((image, index) => {
-        submitData.append("image", image);
-      });
+      console.log("fileInput.current: ", fileInput.current);
+      console.log("images: ", images);
+      if (images.length > 0) {
+        submitData.append("image", images[0]);
+      }
       console.log("Form data before submission:", formData);
 
       console.log("FormData as array:", Array.from(submitData.entries()));
